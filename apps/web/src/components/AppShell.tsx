@@ -71,24 +71,17 @@ export function AppShell({ active, children }: AppShellProps) {
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon
             const isActive = item.key === active
-            const content = (
-              <span
-                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13.5px] font-medium transition-colors ${
-                  isActive ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary"
-                }`}
-              >
-                <Icon className="size-4" strokeWidth={2} />
-                {item.label}
-              </span>
-            )
-            return item.to ? (
+            return (
               <Link key={item.key} to={item.to}>
-                {content}
+                <span
+                  className={`flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13.5px] font-medium transition-colors ${
+                    isActive ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary"
+                  }`}
+                >
+                  <Icon className="size-4" strokeWidth={2} />
+                  {item.label}
+                </span>
               </Link>
-            ) : (
-              <div key={item.key} className="cursor-default">
-                {content}
-              </div>
             )
           })}
         </div>
