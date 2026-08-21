@@ -1,0 +1,19 @@
+{
+  "name": "devdesk",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --parallel --stream run dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "pnpm --filter web build && pnpm --filter api build",
+    "seed": "pnpm --filter api seed",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f mongo"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

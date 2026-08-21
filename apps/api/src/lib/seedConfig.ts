@@ -1,0 +1,3 @@
+export const DUMMY_COUNTRY_CODE = "+91";
+export const DUMMY_PHONE = "9999999999";
+export const DUMMY_FULL_PHONE = `${DUMMY_COUNTRY_CODE}${DUMMY_PHONE}`;
