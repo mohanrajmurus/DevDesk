@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { CreateTaskSheet } from "@/components/CreateTaskSheet"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { ManualTimeEntryDialog } from "@/components/ManualTimeEntryDialog"
+import { TaskDetailsSkeleton } from "@/components/skeletons"
 import { useElapsed } from "@/hooks/use-elapsed"
 import { useStartTimer, useStopTimer, useDeleteTimeLog, useTaskTimeLogs } from "@/features/timelogs/queries"
 import { useDeleteTask, useTask, useUpdateTask } from "@/features/tasks/queries"
@@ -88,7 +89,7 @@ function TimerCard({
 }
 
 export function TaskDetailsDrawer({ open, onOpenChange, taskId }: TaskDetailsDrawerProps) {
-  const { data: task } = useTask(taskId ?? "")
+  const { data: task, isLoading } = useTask(taskId ?? "")
   const { data: timelogs } = useTaskTimeLogs(task?._id ?? "")
   const startTimer = useStartTimer()
   const stopTimer = useStopTimer()
@@ -172,8 +173,10 @@ export function TaskDetailsDrawer({ open, onOpenChange, taskId }: TaskDetailsDra
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="w-full lg:w-[460px] lg:max-w-[460px] p-0 flex flex-col gap-0">
           <SheetHeader className="px-6 py-5 border-b border-border">
-            <SheetTitle className="text-base">{task?.title}</SheetTitle>
+            <SheetTitle className="text-base">{task?.title ?? (isLoading ? "" : "Task")}</SheetTitle>
           </SheetHeader>
+
+          {isLoading && !task && <TaskDetailsSkeleton />}
 
           {task && (
             <div className="flex-1 overflow-y-auto px-6 py-5.5 space-y-5">

@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { RichTextEditor } from "@/components/RichTextEditor"
+import { NoteDetailsSkeleton } from "@/components/skeletons"
 import { useNote, useUpdateNote } from "@/features/notes/queries"
 
 interface NoteDetailsDialogProps {
@@ -14,7 +15,7 @@ interface NoteDetailsDialogProps {
 }
 
 export function NoteDetailsDialog({ open, onOpenChange, noteId }: NoteDetailsDialogProps) {
-  const { data: note } = useNote(noteId ?? "")
+  const { data: note, isLoading } = useNote(noteId ?? "")
   const updateNote = useUpdateNote(note?._id ?? "", note?.project)
   const [isEditing, setIsEditing] = useState(false)
   const [title, setTitle] = useState("")
@@ -49,7 +50,8 @@ export function NoteDetailsDialog({ open, onOpenChange, noteId }: NoteDetailsDia
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="lg:max-w-[820px] max-h-[88vh] overflow-y-auto">
+      <DialogContent className="lg:max-w-[820px] max-h-[88dvh] overflow-y-auto">
+        {isLoading && !note && <NoteDetailsSkeleton />}
         {note && (
           <>
             <DialogHeader className="flex-row items-center justify-between gap-2 space-y-0 pr-6">

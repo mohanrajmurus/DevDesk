@@ -8,6 +8,7 @@ import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Pagination } from "@/components/ui/pagination"
+import { ListRowsSkeleton } from "@/components/skeletons"
 import { useTimeLogs, useInfiniteTimeLogs, useDeleteTimeLog } from "@/features/timelogs/queries"
 import { timelogsApi } from "@/features/timelogs/api"
 import { useTasks } from "@/features/tasks/queries"
@@ -47,8 +48,10 @@ export default function TimeLogs() {
     projectId: projectFilter === "all" ? undefined : projectFilter,
   }
 
-  const { data: timelogs } = useTimeLogs({ ...filters, page, pageSize: PAGE_SIZE }, { enabled: !isMobile })
+  const paginatedTimeLogs = useTimeLogs({ ...filters, page, pageSize: PAGE_SIZE }, { enabled: !isMobile })
+  const timelogs = paginatedTimeLogs.data
   const infiniteTimeLogs = useInfiniteTimeLogs(filters, { enabled: isMobile })
+  const isLoading = isMobile ? infiniteTimeLogs.isLoading : paginatedTimeLogs.isLoading
 
   const { data: tasks } = useTasks()
   const { data: projects } = useProjects()
@@ -175,7 +178,9 @@ export default function TimeLogs() {
         </div>
       </div>
 
-      {items.length > 0 ? (
+      {isLoading ? (
+        <ListRowsSkeleton rows={7} />
+      ) : items.length > 0 ? (
         <div className="space-y-2">
           {items.map((log) => {
             const task = taskById.get(log.task)

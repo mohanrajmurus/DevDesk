@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useMe, useCompleteProfile, useLogout } from "@/features/auth/queries"
+import { ProfileSkeleton } from "@/components/skeletons"
 import { ApiError } from "@/lib/http"
 
 interface ProfileForm {
@@ -77,6 +78,10 @@ export default function Profile() {
           <p className="text-[13.5px] text-muted-foreground">Manage your personal details and account.</p>
         </div>
 
+        {isLoading ? (
+          <ProfileSkeleton />
+        ) : (
+        <>
         <div className="bg-card border border-border rounded-xl p-6 mb-5">
           <div className="flex items-center gap-4.5">
             <span className="size-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[22px] font-semibold shrink-0">
@@ -166,6 +171,8 @@ export default function Profile() {
             </Button>
           </div>
         </div>
+        </>
+        )}
 
         <button
           onClick={handleSignOut}

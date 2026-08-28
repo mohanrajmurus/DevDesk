@@ -24,6 +24,7 @@ import { NoteFormDialog } from "@/components/NoteFormDialog"
 import { NoteDetailsDialog } from "@/components/NoteDetailsDialog"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ProjectDetailsSkeleton, ListRowsSkeleton, NoteCardsSkeleton } from "@/components/skeletons"
 import { useDeleteProject, useProject } from "@/features/projects/queries"
 import { PROJECT_STATUS_LABELS, PROJECT_STATUS_STYLES } from "@/features/projects/constants"
 import { useProjectTasks } from "@/features/tasks/queries"
@@ -46,9 +47,9 @@ export default function ProjectDetails() {
   const [searchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") ?? "tasks")
   const { data: project, isLoading } = useProject(id ?? "")
-  const { data: tasks } = useProjectTasks(id ?? "")
-  const { data: timelogs } = useProjectTimeLogs(id ?? "")
-  const { data: notes } = useProjectNotes(id ?? "")
+  const { data: tasks, isLoading: tasksLoading } = useProjectTasks(id ?? "")
+  const { data: timelogs, isLoading: timelogsLoading } = useProjectTimeLogs(id ?? "")
+  const { data: notes, isLoading: notesLoading } = useProjectNotes(id ?? "")
   const [editSheetOpen, setEditSheetOpen] = useState(false)
   const [createTaskOpen, setCreateTaskOpen] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
@@ -111,6 +112,8 @@ export default function ProjectDetails() {
         <ArrowLeft className="size-3.5" strokeWidth={2} />
         Back to projects
       </button>
+
+      {isLoading && <ProjectDetailsSkeleton />}
 
       {project && (
         <>
@@ -229,7 +232,9 @@ export default function ProjectDetails() {
                 </Button>
               </div>
 
-              {tasks && tasks.length > 0 ? (
+              {tasksLoading ? (
+                <ListRowsSkeleton rows={3} className="space-y-2.5" />
+              ) : tasks && tasks.length > 0 ? (
                 <div className="space-y-2.5">
                   {tasks.map((task) => (
                     <div
@@ -280,7 +285,9 @@ export default function ProjectDetails() {
                 </Button>
               </div>
 
-              {notes && notes.length > 0 ? (
+              {notesLoading ? (
+                <NoteCardsSkeleton cards={4} />
+              ) : notes && notes.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {notes.map((note) => (
                     <div
@@ -314,7 +321,9 @@ export default function ProjectDetails() {
             ))}
 
             <TabsContent value="timelogs">
-              {timelogs && timelogs.length > 0 ? (
+              {timelogsLoading ? (
+                <ListRowsSkeleton rows={3} />
+              ) : timelogs && timelogs.length > 0 ? (
                 <div className="space-y-2">
                   {timelogs.map((log) => {
                     const start = new Date(log.startTime)

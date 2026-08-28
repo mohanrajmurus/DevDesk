@@ -7,6 +7,7 @@ import { CreateProjectSheet } from "@/components/CreateProjectSheet"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ProjectsGridSkeleton } from "@/components/skeletons"
 import { useDeleteProject, useProjects } from "@/features/projects/queries"
 import { PROJECT_STATUSES, PROJECT_STATUS_LABELS, PROJECT_STATUS_STYLES } from "@/features/projects/constants"
 import type { Project, ProjectStatus } from "@/features/projects/types"
@@ -17,7 +18,7 @@ const STAT_LABELS = ["Tasks", "Notes", "Events", "Time"] as const
 
 export default function Projects() {
   const navigate = useNavigate()
-  const { data: projects } = useProjects()
+  const { data: projects, isLoading } = useProjects()
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState<FilterValue>("all")
   const [editingProject, setEditingProject] = useState<Project | null>(null)
@@ -90,7 +91,9 @@ export default function Projects() {
         </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <ProjectsGridSkeleton />
+      ) : filtered.length === 0 ? (
         <p className="text-center text-[13.5px] text-muted-foreground/70 mt-16">
           {search.trim() ? `No projects match "${search.trim()}".` : "No projects yet."}
         </p>

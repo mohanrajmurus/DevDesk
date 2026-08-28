@@ -6,6 +6,7 @@ import { TaskDetailsDrawer } from "@/components/TaskDetailsDrawer"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Pagination } from "@/components/ui/pagination"
+import { ListRowsSkeleton } from "@/components/skeletons"
 import { useFilteredTasks, useInfiniteTasks } from "@/features/tasks/queries"
 import {
   TASK_PRIORITIES,
@@ -33,8 +34,10 @@ export default function Tasks() {
     priority: priorityFilter === "all" ? undefined : priorityFilter,
   }
 
-  const { data: tasks } = useFilteredTasks({ ...filters, page, pageSize: PAGE_SIZE }, { enabled: !isMobile })
+  const filteredTasks = useFilteredTasks({ ...filters, page, pageSize: PAGE_SIZE }, { enabled: !isMobile })
+  const tasks = filteredTasks.data
   const infiniteTasks = useInfiniteTasks(filters, { enabled: isMobile })
+  const isLoading = isMobile ? infiniteTasks.isLoading : filteredTasks.isLoading
 
   const { data: projects } = useProjects()
   const [createTaskOpen, setCreateTaskOpen] = useState(false)
@@ -103,7 +106,9 @@ export default function Tasks() {
         </div>
       </div>
 
-      {items.length > 0 ? (
+      {isLoading ? (
+        <ListRowsSkeleton rows={7} className="space-y-2.5" />
+      ) : items.length > 0 ? (
         <div className="space-y-2.5">
           {items.map((task) => {
             const project = projectById.get(task.project)

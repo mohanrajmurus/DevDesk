@@ -13,6 +13,7 @@ import { useTasks, useUpdateTask } from "@/features/tasks/queries"
 import { TASK_PRIORITY_LABELS, TASK_PRIORITY_STYLES } from "@/features/tasks/constants"
 import type { Task as RealTask } from "@/features/tasks/types"
 import type { Project } from "@/features/projects/types"
+import { DashboardSkeleton } from "@/components/skeletons"
 import { formatMinutes } from "@/lib/constants"
 
 function isDueToday(dueDate?: string) {
@@ -110,11 +111,19 @@ function startOfWeek() {
 
 export default function Dashboard() {
   const { data: me } = useMe()
-  const { data: projects } = useProjects()
-  const { data: timelogs } = useAllTimeLogs()
-  const { data: allTasks } = useTasks()
+  const { data: projects, isLoading: projectsLoading } = useProjects()
+  const { data: timelogs, isLoading: timelogsLoading } = useAllTimeLogs()
+  const { data: allTasks, isLoading: tasksLoading } = useTasks()
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [projectSheetOpen, setProjectSheetOpen] = useState(false)
+
+  if (projectsLoading || timelogsLoading || tasksLoading) {
+    return (
+      <AppShell active="dashboard">
+        <DashboardSkeleton />
+      </AppShell>
+    )
+  }
 
   const projectById = new Map((projects ?? []).map((p) => [p._id, p]))
   const tasksDueToday = (allTasks ?? []).filter((t) => isDueToday(t.dueDate))
