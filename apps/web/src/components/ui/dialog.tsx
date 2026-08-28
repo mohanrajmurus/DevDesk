@@ -67,8 +67,10 @@ function DialogContent({
         style={contentStyle}
         className={cn(
           "fixed z-50 grid w-full gap-4 border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
-          // Mobile (below lg): bottom sheet.
-          "max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:left-0 max-lg:max-w-none max-lg:max-h-[85vh] max-lg:translate-x-0 max-lg:translate-y-0 max-lg:overflow-y-auto max-lg:rounded-t-2xl max-lg:rounded-b-none max-lg:data-[state=closed]:slide-out-to-bottom max-lg:data-[state=open]:slide-in-from-bottom",
+          // Mobile (below lg): bottom sheet. dvh (not vh) so it tracks the
+          // visible viewport and never slides under the browser chrome;
+          // transform-gpu + will-change keep the slide-in on its own layer.
+          "max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:left-0 max-lg:max-w-none max-lg:max-h-[90dvh] max-lg:translate-x-0 max-lg:translate-y-0 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:rounded-t-2xl max-lg:rounded-b-none max-lg:pb-[max(1.5rem,env(safe-area-inset-bottom))] max-lg:transform-gpu max-lg:[will-change:transform] max-lg:[backface-visibility:hidden] max-lg:data-[state=closed]:slide-out-to-bottom max-lg:data-[state=open]:slide-in-from-bottom max-lg:data-[state=open]:duration-200",
           // Desktop (lg+): original centered modal, untouched.
           "lg:top-[50%] lg:left-[50%] lg:max-w-lg lg:translate-x-[-50%] lg:translate-y-[-50%] lg:rounded-lg lg:data-[state=closed]:zoom-out-95 lg:data-[state=open]:zoom-in-95",
           className

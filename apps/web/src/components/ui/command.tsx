@@ -91,7 +91,9 @@ function CommandList({
     <CommandPrimitive.List
       data-slot="command-list"
       className={cn(
-        "max-h-[60vh] scroll-py-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:max-h-[300px]",
+        // Mobile: tall, stable panel (dvh tracks the visible viewport, min-h
+        // stops it collapsing as results stream in). Desktop unchanged.
+        "max-lg:max-h-[75dvh] max-lg:min-h-[45dvh] max-h-[60vh] scroll-py-1 overflow-x-hidden overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:max-h-[300px] lg:min-h-0",
         className
       )}
       {...props}
