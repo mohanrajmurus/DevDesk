@@ -59,9 +59,10 @@ authRouter.post("/send-otp", async (req, res) => {
 
   console.log(`[dev] OTP for ${fullPhone}: ${otp}`);
 
-  const response: Record<string, unknown> = { message: "OTP sent" };
-  if (process.env.NODE_ENV !== "production") response.devOtp = otp;
-  res.json(response);
+  // No SMS provider is wired up yet, so the OTP is returned in the response
+  // (and auto-filled by the client) in every environment. Remove this once a
+  // real delivery channel is in place.
+  res.json({ message: "OTP sent", devOtp: otp });
 });
 
 authRouter.post("/verify-otp", async (req, res) => {
