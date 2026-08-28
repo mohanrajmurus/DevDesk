@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { formatClock } from "@/lib/dummy-data"
+import { formatClock } from "@/lib/constants"
 
 export function useClock() {
   const [now, setNow] = useState(() => new Date())

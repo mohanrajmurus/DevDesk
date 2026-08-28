@@ -6,17 +6,38 @@ import { ActiveTimerBanner } from "@/components/ActiveTimerBanner"
 import { TaskDetailsDrawer } from "@/components/TaskDetailsDrawer"
 import { CreateProjectSheet } from "@/components/CreateProjectSheet"
 import { Badge } from "@/components/ui/badge"
+import { useMe } from "@/features/auth/queries"
 import { useProjects } from "@/features/projects/queries"
 import { useAllTimeLogs } from "@/features/timelogs/queries"
 import { useTasks, useUpdateTask } from "@/features/tasks/queries"
 import { TASK_PRIORITY_LABELS, TASK_PRIORITY_STYLES } from "@/features/tasks/constants"
 import type { Task as RealTask } from "@/features/tasks/types"
 import type { Project } from "@/features/projects/types"
-import { HIGH_PRIORITY_FOCUS, TODAY_EVENTS, UPCOMING_GROUPS, formatMinutes } from "@/lib/dummy-data"
+import { formatMinutes } from "@/lib/constants"
 
 function isDueToday(dueDate?: string) {
   if (!dueDate) return false
   return new Date(dueDate).toDateString() === new Date().toDateString()
+}
+
+function formatDue(dueDate?: string) {
+  if (!dueDate) return "No due date"
+  const due = new Date(dueDate)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const diffDays = Math.round((due.setHours(0, 0, 0, 0) - today.getTime()) / 86_400_000)
+  if (diffDays === 0) return "Today"
+  if (diffDays === 1) return "Tomorrow"
+  if (diffDays === -1) return "Yesterday"
+  if (diffDays < 0) return `${-diffDays} days overdue`
+  return due.toLocaleDateString(undefined, { month: "short", day: "2-digit" })
+}
+
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 12) return "Good morning"
+  if (h < 18) return "Good afternoon"
+  return "Good evening"
 }
 
 function TaskDueRow({
@@ -88,6 +109,7 @@ function startOfWeek() {
 }
 
 export default function Dashboard() {
+  const { data: me } = useMe()
   const { data: projects } = useProjects()
   const { data: timelogs } = useAllTimeLogs()
   const { data: allTasks } = useTasks()
@@ -96,6 +118,10 @@ export default function Dashboard() {
 
   const projectById = new Map((projects ?? []).map((p) => [p._id, p]))
   const tasksDueToday = (allTasks ?? []).filter((t) => isDueToday(t.dueDate))
+  const highPriorityTasks = (allTasks ?? [])
+    .filter((t) => t.priority === "high" && t.status !== "done")
+    .sort((a, b) => (a.dueDate ?? "9999").localeCompare(b.dueDate ?? "9999"))
+    .slice(0, 5)
   const weekStart = startOfWeek()
 
   const weeklyMinutesByProject = new Map<string, number>()
@@ -121,13 +147,15 @@ export default function Dashboard() {
   const statCards = [
     { label: "Projects", value: projects?.length ?? 0 },
     { label: "Tasks", value: allTasks?.length ?? 0 },
-    { label: "Events", value: 5 },
+    { label: "This week", value: formatMinutes(weeklyTotal) },
   ]
 
   return (
     <AppShell active="dashboard">
       <div className="mb-5.5">
-        <h1 className="text-[26px] font-semibold tracking-tight leading-tight mb-1">Good morning, Mohanraj</h1>
+        <h1 className="text-[26px] font-semibold tracking-tight leading-tight mb-1">
+          {greeting()}{me?.user.name ? `, ${me.user.name.split(" ")[0]}` : ""}
+        </h1>
         <p className="text-[13.5px] text-muted-foreground">Here's what's happening today.</p>
       </div>
 
@@ -173,72 +201,33 @@ export default function Dashboard() {
             <div className="mb-3 border-b border-border pb-2">
               <h2 className="text-[15px] font-semibold tracking-tight">High Priority Focus</h2>
             </div>
-            <div className="flex flex-col">
-              {HIGH_PRIORITY_FOCUS.map((h) => (
-                <div
-                  key={h.title}
-                  className="flex items-center gap-3 py-2.5 px-3 border border-border rounded-[10px] mb-2 bg-card"
-                >
-                  <span className="flex-1">
-                    <div className="text-[13.5px] font-medium">{h.title}</div>
-                    <div className="text-[11.5px] text-muted-foreground/70 mt-0.5">
-                      {h.project} · Due {h.due}
-                    </div>
-                  </span>
-                  <Badge className="bg-[#ffefcf] text-[#ab570a] rounded-md text-[11px] font-medium">{h.priority}</Badge>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <div className="mb-3 border-b border-border pb-2">
-              <h2 className="text-[15px] font-semibold tracking-tight">Upcoming Events</h2>
-            </div>
-            {UPCOMING_GROUPS.map((g) => (
-              <div key={g.date} className="mb-3.5">
-                <div className="font-mono text-[10.5px] font-medium uppercase tracking-wide text-muted-foreground/70 mb-1.5">
-                  {g.date}
-                </div>
-                {g.items.map((e) => (
-                  <div key={e.title} className="flex items-center gap-3 py-2 px-1 border-b border-border">
-                    <span className="text-xs text-muted-foreground/70 w-[76px] shrink-0">{e.time}</span>
-                    <span className="flex-1 text-[13.5px]">{e.title}</span>
-                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <span className="size-1.5 rounded-full" style={{ background: e.projectColor }} />
-                      {e.project}
+            {highPriorityTasks.length > 0 ? (
+              <div className="flex flex-col">
+                {highPriorityTasks.map((task) => (
+                  <div
+                    key={task._id}
+                    onClick={() => setSelectedTaskId(task._id)}
+                    className="flex items-center gap-3 py-2.5 px-3 border border-border rounded-[10px] mb-2 bg-card cursor-pointer hover:bg-secondary/50 transition-colors"
+                  >
+                    <span className="flex-1">
+                      <div className="text-[13.5px] font-medium">{task.title}</div>
+                      <div className="text-[11.5px] text-muted-foreground/70 mt-0.5">
+                        {projectById.get(task.project)?.name ?? "Unknown project"} · Due {formatDue(task.dueDate)}
+                      </div>
                     </span>
+                    <Badge className={`rounded-md text-[11px] font-medium ${TASK_PRIORITY_STYLES.high}`}>
+                      {TASK_PRIORITY_LABELS.high}
+                    </Badge>
                   </div>
                 ))}
               </div>
-            ))}
+            ) : (
+              <div className="py-5 px-1 text-[13px] text-muted-foreground/70">No high priority tasks open.</div>
+            )}
           </section>
         </div>
 
         <div className="flex flex-col gap-7">
-          <section>
-            <div className="mb-3 border-b border-border pb-2">
-              <h2 className="text-[15px] font-semibold tracking-tight">Today's Events</h2>
-            </div>
-            <div className="flex flex-col">
-              {TODAY_EVENTS.map((e) => (
-                <div key={e.title} className="py-2.5 px-1 border-b border-border">
-                  <div className="text-xs text-muted-foreground/70 mb-0.5">
-                    {e.time}
-                    {e.duration && ` · ${e.duration}`}
-                  </div>
-                  <div className="text-[13.5px] font-medium">{e.title}</div>
-                  {e.project && (
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-                      <span className="size-1.5 rounded-full" style={{ background: e.projectColor ?? undefined }} />
-                      {e.project}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-
           <section>
             <div className="mb-3 border-b border-border pb-2">
               <h2 className="text-[15px] font-semibold tracking-tight">Weekly Time by Project</h2>

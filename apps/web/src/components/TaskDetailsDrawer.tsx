@@ -10,7 +10,7 @@ import { useElapsed } from "@/hooks/use-elapsed"
 import { useStartTimer, useStopTimer, useDeleteTimeLog, useTaskTimeLogs } from "@/features/timelogs/queries"
 import { useDeleteTask, useTask, useUpdateTask } from "@/features/tasks/queries"
 import { TASK_PRIORITY_LABELS, TASK_PRIORITY_STYLES, TASK_STATUS_LABELS, TASK_STATUS_STYLES } from "@/features/tasks/constants"
-import { formatMinutes } from "@/lib/dummy-data"
+import { formatMinutes } from "@/lib/constants"
 import type { TimeLog } from "@/features/timelogs/types"
 
 interface TaskDetailsDrawerProps {

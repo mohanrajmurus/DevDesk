@@ -31,7 +31,7 @@ import {
   CommandList,
 } from "@/components/ui/command"
 import { cn } from "@/lib/utils"
-import { COUNTRIES, COUNTRY_CODES, PROJECT_COLORS, type Country, type ProjectColor } from "@/lib/dummy-data"
+import { COUNTRIES, COUNTRY_CODES, PROJECT_COLORS, type Country, type ProjectColor } from "@/lib/constants"
 import { useCreateProject, useUpdateProject } from "@/features/projects/queries"
 import { PROJECT_STATUSES } from "@/features/projects/constants"
 import type { Project, ProjectStatus } from "@/features/projects/types"

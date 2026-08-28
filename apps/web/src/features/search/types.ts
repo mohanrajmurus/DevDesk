@@ -1,4 +1,4 @@
-import type { ProjectColor } from "@/lib/dummy-data"
+import type { ProjectColor } from "@/lib/constants"
 import type { ProjectStatus } from "@/features/projects/types"
 import type { TaskPriority, TaskStatus } from "@/features/tasks/types"
 

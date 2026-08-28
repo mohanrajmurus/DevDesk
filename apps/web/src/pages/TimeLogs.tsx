@@ -12,7 +12,7 @@ import { useTimeLogs, useInfiniteTimeLogs, useDeleteTimeLog } from "@/features/t
 import { timelogsApi } from "@/features/timelogs/api"
 import { useTasks } from "@/features/tasks/queries"
 import { useProjects } from "@/features/projects/queries"
-import { formatMinutes } from "@/lib/dummy-data"
+import { formatMinutes } from "@/lib/constants"
 import { useIsMobile } from "@/hooks/use-is-mobile"
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll"
 

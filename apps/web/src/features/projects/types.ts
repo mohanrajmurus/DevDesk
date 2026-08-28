@@ -1,4 +1,4 @@
-import type { ProjectColor, Country } from "@/lib/dummy-data"
+import type { ProjectColor, Country } from "@/lib/constants"
 
 export type ProjectStatus = "active" | "on-hold" | "completed"
 

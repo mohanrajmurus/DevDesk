@@ -30,7 +30,7 @@ import { useProjectTasks } from "@/features/tasks/queries"
 import { TASK_PRIORITY_LABELS, TASK_PRIORITY_STYLES, TASK_STATUS_LABELS, TASK_STATUS_STYLES } from "@/features/tasks/constants"
 import { useProjectTimeLogs } from "@/features/timelogs/queries"
 import { useProjectNotes } from "@/features/notes/queries"
-import { formatMinutes } from "@/lib/dummy-data"
+import { formatMinutes } from "@/lib/constants"
 
 const NON_TASK_TABS = [
   { value: "events", label: "Events", icon: CalendarDays, empty: "No events yet for this project." },
