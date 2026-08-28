@@ -22,16 +22,22 @@ export function verifyToken(token: string): TokenPayload | null {
   }
 }
 
+// In production the web and API are deployed on separate domains, so the auth
+// cookie has to be sent on cross-site requests: that requires SameSite=None,
+// which browsers only honour together with Secure.
+const crossSite = process.env.NODE_ENV === "production";
+
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: crossSite ? ("none" as const) : ("lax" as const),
+  secure: crossSite,
+  path: "/",
+};
+
 export function setAuthCookie(res: Response, token: string) {
-  res.cookie(COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: JWT_EXPIRES_IN_MS,
-    path: "/",
-  });
+  res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: JWT_EXPIRES_IN_MS });
 }
 
 export function clearAuthCookie(res: Response) {
-  res.clearCookie(COOKIE_NAME, { path: "/" });
+  res.clearCookie(COOKIE_NAME, cookieOptions);
 }

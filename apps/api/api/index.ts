@@ -1,5 +1,5 @@
-import { app } from "../apps/api/src/app.js";
-import { connectDB } from "../apps/api/src/lib/db.js";
+import { app } from "../src/app.js";
+import { connectDB } from "../src/lib/db.js";
 
 const MONGODB_URI = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/devdesk";
 
