@@ -6,7 +6,7 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { useSwipeToClose } from "@/hooks/use-swipe-to-close"
+import { useSheetDrag } from "@/hooks/use-sheet-drag"
 
 function Dialog({
   ...props
@@ -57,13 +57,14 @@ function DialogContent({
   showCloseButton?: boolean
 }) {
   const closeRef = React.useRef<HTMLButtonElement>(null)
-  const { handleProps, contentStyle } = useSwipeToClose(() => closeRef.current?.click())
+  const { handleProps, contentStyle, expanded } = useSheetDrag(() => closeRef.current?.click())
 
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
+        data-expanded={expanded}
         style={contentStyle}
         className={cn(
           "fixed z-50 grid w-full gap-4 border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
@@ -71,6 +72,9 @@ function DialogContent({
           // visible viewport and never slides under the browser chrome;
           // transform-gpu + will-change keep the slide-in on its own layer.
           "max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:left-0 max-lg:max-w-none max-lg:max-h-[90dvh] max-lg:translate-x-0 max-lg:translate-y-0 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:rounded-t-2xl max-lg:rounded-b-none max-lg:pb-[max(1.5rem,env(safe-area-inset-bottom))] max-lg:transform-gpu max-lg:[will-change:transform] max-lg:[backface-visibility:hidden] max-lg:data-[state=closed]:slide-out-to-bottom max-lg:data-[state=open]:slide-in-from-bottom max-lg:data-[state=open]:duration-200",
+          // Swipe the grab handle up to expand: raise the sheet's ceiling and,
+          // for the search palette, its result list.
+          "max-lg:transition-[max-height] max-lg:duration-200 max-lg:ease-out max-lg:data-[expanded=true]:max-h-[96dvh] max-lg:data-[expanded=true]:[&_[data-slot=command-list]]:max-h-[85dvh] max-lg:data-[expanded=true]:[&_[data-slot=command-list]]:min-h-[80dvh]",
           // Desktop (lg+): original centered modal, untouched.
           "lg:top-[50%] lg:left-[50%] lg:max-w-lg lg:translate-x-[-50%] lg:translate-y-[-50%] lg:rounded-lg lg:data-[state=closed]:zoom-out-95 lg:data-[state=open]:zoom-in-95",
           className

@@ -3,7 +3,7 @@ import { XIcon } from "lucide-react"
 import { Dialog as SheetPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
-import { useSwipeToClose } from "@/hooks/use-swipe-to-close"
+import { useSheetDrag } from "@/hooks/use-sheet-drag"
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
@@ -54,13 +54,14 @@ function SheetContent({
   showCloseButton?: boolean
 }) {
   const closeRef = React.useRef<HTMLButtonElement>(null)
-  const { handleProps, contentStyle } = useSwipeToClose(() => closeRef.current?.click())
+  const { handleProps, contentStyle, expanded } = useSheetDrag(() => closeRef.current?.click())
 
   return (
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content
         data-slot="sheet-content"
+        data-expanded={expanded}
         style={contentStyle}
         className={cn(
           "fixed z-50 flex flex-col gap-4 bg-background shadow-lg ease-out data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:animate-in data-[state=open]:duration-300",
@@ -68,6 +69,8 @@ function SheetContent({
           // dvh (not vh) so it never slides under the browser chrome;
           // transform-gpu + will-change keep the slide-in on its own layer.
           "max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:h-auto max-lg:max-h-[90dvh] max-lg:w-full max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:rounded-t-2xl max-lg:border-t max-lg:pb-[max(1rem,env(safe-area-inset-bottom))] max-lg:transform-gpu max-lg:[will-change:transform] max-lg:[backface-visibility:hidden] max-lg:data-[state=closed]:slide-out-to-bottom max-lg:data-[state=open]:slide-in-from-bottom max-lg:data-[state=open]:duration-200",
+          // Swipe the grab handle up to expand to (near) full height.
+          "max-lg:transition-[height,max-height] max-lg:duration-200 max-lg:ease-out max-lg:data-[expanded=true]:h-[94dvh] max-lg:data-[expanded=true]:max-h-[94dvh]",
           // Desktop (lg+): original side-based positioning, untouched.
           side === "right" &&
             "lg:inset-y-0 lg:right-0 lg:h-full lg:w-3/4 lg:border-l lg:data-[state=closed]:slide-out-to-right lg:data-[state=open]:slide-in-from-right lg:max-w-sm",
