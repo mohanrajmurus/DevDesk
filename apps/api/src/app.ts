@@ -9,7 +9,7 @@ import { timelogsRouter } from "./routes/timelogs.js";
 import { notesRouter } from "./routes/notes.js";
 import { searchRouter } from "./routes/search.js";
 
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
+const CLIENT_ORIGIN = (process.env.CLIENT_ORIGIN ?? "http://localhost:5173").replace(/\/$/, "");
 const MONGODB_URI = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/devdesk";
 
 export const app = express();
