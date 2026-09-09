@@ -26,14 +26,19 @@ let loggingOut = false
 http.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiErrorBody>) => {
-    if (error.response?.status === 401 && !loggingOut && window.location.pathname !== "/login") {
+    // A 401 from `/auth/me` is the normal "logged out" signal — let React Query
+    // surface it so route guards can redirect. Only a 401 on some other request
+    // means a session expired mid-use, which warrants a hard redirect.
+    const isMeCheck = error.config?.url?.endsWith("/auth/me")
+
+    if (error.response?.status === 401 && !isMeCheck && !loggingOut && window.location.pathname !== "/") {
       loggingOut = true
       queryClient.clear()
       // Bare axios, not `http` — avoids re-entering this same interceptor.
       await axios
         .post(`${http.defaults.baseURL}/auth/logout`, undefined, { withCredentials: true })
         .catch(() => {})
-      window.location.href = "/login"
+      window.location.href = "/"
     }
 
     const body = error.response?.data
